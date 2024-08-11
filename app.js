@@ -8,10 +8,9 @@ class Note {
 
 class App {
   constructor() {
-    localStorage.setItem("test", JSON.stringify(["123"]));
-    this.notes = JSON.parse(localStorage.getItem('notes')) || [];
-    console.log(this.notes);
-    this.notes = [new Note("abc1", "test title", "test text")];
+    // localStorage.setItem('test', JSON.stringify(['123']));
+    // console.log(JSON.parse(localStorage.getItem('test')));
+    this.notes = JSON.parse(localStorage.getItem("notes")) || [];
     this.selectedNoteId = "";
     this.miniSidebar = true;
 
@@ -55,11 +54,19 @@ class App {
 
     this.$sidebar.addEventListener("mouseover", (event) => {
       this.handleToggleSidebar();
-    })
+    });
 
     this.$sidebar.addEventListener("mouseout", (event) => {
       this.handleToggleSidebar();
-    })
+    });
+    // Adding event listeners for note hover effects
+    this.$notes.addEventListener("mouseover", (event) => {
+      this.handleMouseOverNote(event);
+    });
+
+    this.$notes.addEventListener("mouseout", (event) => {
+      this.handleMouseOutNote(event);
+    });
 
   }
 
@@ -104,8 +111,13 @@ class App {
 
   closeModal(event) {
     const isModalFormClickedOn = this.$modalForm.contains(event.target);
-    const isCloseModalBtnClickedOn = this.$closeModalForm.contains(event.target);
-    if ((!isModalFormClickedOn || isCloseModalBtnClickedOn) && this.$modal.classList.contains("open-modal")) {
+    const isCloseModalBtnClickedOn = this.$closeModalForm.contains(
+      event.target
+    );
+    if (
+      (!isModalFormClickedOn || isCloseModalBtnClickedOn) &&
+      this.$modal.classList.contains("open-modal")
+    ) {
       this.editNote(this.selectedNoteId, {
         title: this.$modalTitle.value,
         text: this.$modalText.value,
@@ -143,51 +155,65 @@ class App {
     this.render();
   }
 
-  handleMouseOverNote(element) {
-    const $note = document.querySelector("#" + element.id);
-    const $checkNote = $note.querySelector(".check-circle");
-    const $noteFooter = $note.querySelector(".note-footer");
-    $checkNote.style.visibility = "visible";
-    $noteFooter.style.visibility = "visible";
+  // handleMouseOverNote(element) {
+  //   const $note = document.querySelector("#" + element.id);
+  //   const $checkNote = $note.querySelector(".check-circle");
+  //   const $noteFooter = $note.querySelector(".note-footer");
+  //   $checkNote.style.visibility = "visible";
+  //   $noteFooter.style.visibility = "visible";
+  // }
+  handleMouseOverNote(event) {
+    const $note = event.target.closest(".note");
+    if ($note) {
+      const $checkNote = $note.querySelector(".check-circle");
+      const $noteFooter = $note.querySelector(".note-footer");
+      $checkNote.style.visibility = "visible";
+      $noteFooter.style.visibility = "visible";
+    }
   }
 
-  handleMouseOutNote(element) {
-    const $note = document.querySelector("#" + element.id);
-    const $checkNote = $note.querySelector(".check-circle");
-    const $noteFooter = $note.querySelector(".note-footer");
-    $checkNote.style.visibility = "hidden";
-    $noteFooter.style.visibility = "hidden";
+
+  handleMouseOutNote(event) {
+    const $note = event.target.closest(".note");
+    if ($note) {
+      const $checkNote = $note.querySelector(".check-circle");
+      const $noteFooter = $note.querySelector(".note-footer");
+      $checkNote.style.visibility = "hidden";
+      $noteFooter.style.visibility = "hidden";
+    }
   }
 
   handleToggleSidebar() {
-    if(this.miniSidebar) {
+    if (this.miniSidebar) {
       this.$sidebar.style.width = "250px";
       this.$sidebar.classList.add("sidebar-hover");
       this.$sidebarActiveItem.classList.add("sidebar-active-item");
       this.miniSidebar = false;
-    }
-    else {
-      this.$sidebar.style.width = "75px";
-      this.$sidebar.classList.remove("sidebar-hover")
+    } else {
+      this.$sidebar.style.width = "80px";
+      this.$sidebar.classList.remove("sidebar-hover");
       this.$sidebarActiveItem.classList.remove("sidebar-active-item");
       this.miniSidebar = true;
     }
   }
 
-// onmouseover="app.handleMouseOverNote(this)" onmouseout="app.handleMouseOutNote(this)"
-  saveNotes(){
-    localStorage.setItem("notes", JSON.stringify(this.notes));
+  saveNotes() {
+    localStorage.setItem('notes', JSON.stringify(this.notes));
   }
-  render(){
+
+  render() {
     this.saveNotes();
     this.displayNotes();
   }
+
+//  onmouseover="app.handleMouseOverNote(this)" onmouseout="app.handleMouseOutNote(this)"
+
   displayNotes() {
     this.$notes.innerHTML = this.notes
       .map(
         (note) =>
           `
-        <div class="note" id="${note.id}" >
+        <div class="note" id="${note.id}">
           <span class="material-symbols-outlined check-circle"
             >check_circle</span
           >
